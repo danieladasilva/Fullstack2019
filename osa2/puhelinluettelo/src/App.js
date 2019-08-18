@@ -45,30 +45,13 @@ const PersonForm = (props) => {
     )
 }
 
-// const Persons = (props) => {
-//     const filteredPersons = props.filteredPersons
-//     const persons = props.persons
-//     return (
-//         <div>
-//         filteredPersons.map(person => 
-//             <li key={person.id}>{person.name} {person.number}</li>
-//         )
-//         </div>
-//     )
-    
-//     // const allPersons = () => {
-//     //     return (
-//     //       filteredPersons.map(person => 
-//     //           <li key={person.id}>{person.name} {person.number}</li>
-//     //           )
-//     //       )
-//     //     }
-//     // return (
-//     //     <ul>
-//     //         {allPersons()}
-//     //     </ul>
-//     // )
-// }
+const Persons = (props) => {
+    return (
+        filteredPersons.map(person => 
+            <li key={person.id}>{person.name} {person.number}</li>
+        )
+    )  
+}
 
 const Filter = (props) => {
     const {filter, handleFilterChange} = props
