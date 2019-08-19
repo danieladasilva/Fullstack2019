@@ -44,7 +44,7 @@ const Countries = (props) => {
   //jos maita on tasan 1
   if (filteredCountries.length === 1) {
     console.log('ehto3.')
-    //setShowCountry(filteredCountries[0])
+    setShowCountry(filteredCountries[0])
     console.log(filteredCountries[0].name)
     return (
         filteredCountries.map(country => 
