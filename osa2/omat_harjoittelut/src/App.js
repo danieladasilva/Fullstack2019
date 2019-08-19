@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 import Note from './components/Note.js'
 
 const App = (props) => {
@@ -6,6 +7,18 @@ const App = (props) => {
     const [newNote, setNewNote] = useState('uusi muistiinpano')
     const [showAll, setShowAll] = useState(true)
 
+    const haeData = () => {
+      console.log('Kutsuttiin useEffect-metodia')
+      axios
+        .get('http://localhost:3001/notes')
+        .then(response => {
+          console.log('promise fulfilled')
+          setNotes(response.data)
+        })
+    }
+    
+    useEffect(haeData, [])
+    console.log('render', notes.length, 'notes')
     
     //muuttujan arvoksi asetetaan 'notes' jos showAll on true
     //ja 'notes.filter..' jos showAll on false

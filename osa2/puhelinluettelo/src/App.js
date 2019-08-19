@@ -5,6 +5,7 @@ const PersonForm = (props) => {
         setPersons, setNewName, setNewNumber,
         handleNameChange, handleNumberChange} = props
 
+    //Tämä on tapahtumankäsittelijä ja sen voisi ehkä siirtää Appiin???
     const addPerson = (event) => {
         event.preventDefault()
         //jos nimi on jo taulukossa, palauttaa nimen
@@ -34,7 +35,7 @@ const PersonForm = (props) => {
         <div>
         <form onSubmit={addPerson}>
             <div>
-                Nimi: <input value={newName} onChange={handleNameChange}/>
+                Nimi: <input value={newName} onChange={handleNameChange}/> 
                 Numero: <input value={newNumber} onChange={handleNumberChange}/>
             </div>
             <div>
@@ -46,6 +47,8 @@ const PersonForm = (props) => {
 }
 
 const Persons = (props) => {
+    const {persons, filter} = props
+    const filteredPersons = persons.filter(person => person.name.includes(filter))
     return (
         filteredPersons.map(person => 
             <li key={person.id}>{person.name} {person.number}</li>
@@ -71,16 +74,6 @@ const App = () => {
   const [newName, setNewName ] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-
-  const filteredPersons = persons.filter(person => person.name.includes(filter))
-
-  const allPersons = () => {
-    return (
-      filteredPersons.map(person => 
-          <li key={person.id}>{person.name} {person.number}</li>
-          )
-      )
-    }
 
     //TAPAHTUMANKÄSITTELIJÄT
   const handleNameChange = (event) => {
@@ -110,12 +103,8 @@ const App = () => {
                 setPersons={setPersons} setNewName={setNewName} setNewNumber={setNewNumber}
                 handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}/>
    
-
       <h2>Numerot</h2>
-      {/* <Persons filteredPersons={filteredPersons} persons={persons}/> */}
-        <ul>
-            {allPersons()}
-        </ul>
+      <Persons persons={persons} filter={filter}/>
     </div>
   )
 
