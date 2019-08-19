@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const PersonForm = (props) => {
     const {persons, newName, newNumber, 
@@ -66,14 +67,24 @@ const Filter = (props) => {
 }
 
 const App = () => {
-  const [persons, setPersons] = useState([
-      {id: 0, name: 'Arto Hellas', number: '050-1234567'},
-      {id: 1, name: 'Rami', number: '040-1234567'},
-      {id: 2, name: 'Daniela', number: '050-7654321'}]) 
-  
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName ] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+
+  const haeData = () => {
+    console.log('Kutsuttiin useEffect-metodia')
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('promise fulfilled')
+        console.log('data: ', response.data)
+        setPersons(response.data)
+      })
+  }
+  
+  useEffect(haeData, [])
+
 
     //TAPAHTUMANKÄSITTELIJÄT
   const handleNameChange = (event) => {
