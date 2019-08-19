@@ -3,15 +3,20 @@ import ReactDOM from 'react-dom'
 import App from './App.js'
 import axios from 'axios'
 
-axios
-.get('http://localhost:3001/notes')
-.then(response => {
-  const notes = response.data
-  ReactDOM.render(
-    <App notes={notes} />,
-    document.getElementById('root')
-  )
-})
+ReactDOM.render(
+  <App notes={notes} />,
+  document.getElementById('root')
+)
+
+// axios
+// .get('http://localhost:3001/notes')
+// .then(response => {
+//   const notes = response.data
+//   ReactDOM.render(
+//     <App notes={notes} />,
+//     document.getElementById('root')
+//   )
+// })
 
 // const promise2 = axios.get('http://localhost:3001/foobar')
 // console.log(promise2)
