@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-//import axios from 'axios'
+import axios from 'axios'
 
 const Filter = (props) => {
   const {filter, handleFilterChange} = props
@@ -13,13 +13,15 @@ const Filter = (props) => {
 const Countries = (props) => {
   const {countries, filter, setShowCountry} = props
   const filteredCountries = countries.filter(country => country.name.includes(filter))
-  
-  const showFilteredCountries = () => {
-    return (
-      filteredCountries.map(country => 
-        <li key={country.id}>{country.name}</li>)
-    )
-  }
+
+  // const showFilteredCountries = () => {
+  //   return (
+  //     filteredCountries.map(country => 
+  //       <li key={country.id}>{country.name}</li>)
+  //   )
+  // }
+
+
 
   console.log('Maita filteröidyssä taulukossa: ', filteredCountries.length)
   //jos maita on yli 10
@@ -37,7 +39,7 @@ const Countries = (props) => {
     return (
       <div>
         Näytetään 2-10 hakuehdon täyttävää maata.
-        {showFilteredCountries()}
+        {/* {showFilteredCountries()} */}
       </div>
     )
   }
@@ -63,7 +65,24 @@ const Countries = (props) => {
 }
 
 const Country = (props) => {
-  const {showCountry} = props
+  const {showCountry,} = props
+
+  const haeData = () => {
+    console.log('Kutsuttiin useEffect-metodia')
+    axios
+      .get('https://restcountries.eu/rest/v2/name/' + showCountry)
+      .then(response => {
+        console.log('promise fulfilled')
+        console.log('data: ', response.data)
+        //setPersons(response.data)
+      })
+  }
+  
+  useEffect(haeData, [])
+
+
+
+
   return (
     <div>
       Tässä näytetään maahan liittyvät tiedot
@@ -80,7 +99,37 @@ const App = () => {
       { id: 4, name: 'norway', capital: 'Oslo', population: '10 million', languages: ['norwegian'] },
     ])
     const [filter, setFilter] = useState('')
-    const [showCountry, setShowCountry] = useState('')
+    const [showCountry, setShowCountry] = useState('finland')
+
+    // useEffect( () => {
+    //   axios
+    //       .get('https://restcountries.eu/rest/v2/name/' + filter)
+    //       .then((response) => {
+    //           setCountries(response.data)
+    //       })
+    //       .catch((e) => {
+    //         setCountries([])
+    //       })
+      
+    //   }, [countryName])
+
+      const haeDataFilter = () => {
+        console.log('Kutsuttiin useEffect-metodiaa')
+        axios
+          .get('https://restcountries.eu/rest/v2/name/' + filter)
+          .then(response => {
+            console.log('promise fulfilled')
+            console.log('data: ', response.data)
+            console.log('nimi: ', response.data[0].name)
+            setCountries(response.data)
+          })
+          .catch( (e) => {
+            setCountries([])
+          })
+      }
+      useEffect(haeDataFilter, [filter])
+
+
 
 //TAPAHTUMANKÄSITTELIJÄT TÄNNE
 
@@ -93,7 +142,7 @@ const App = () => {
       <div>
         <h1> Find countries </h1>
         <Filter filter={filter} handleFilterChange={handleFilterChange}/>
-        <Countries countries={countries} filter={filter}/>
+        <Countries countries={countries} filter={filter} setShowCountry={setShowCountry}/>
       </div>
     )
   }
