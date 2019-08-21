@@ -11,22 +11,10 @@ const Filter = (props) => {
 }
 
 const Countries = (props) => {
-  const {countries, filter, setShowCountry} = props
-  const filteredCountries = countries.filter(country => country.name.includes(filter))
+  const {countries, handleClick} = props
 
-  // const showFilteredCountries = () => {
-  //   return (
-  //     filteredCountries.map(country => 
-  //       <li key={country.id}>{country.name}</li>)
-  //   )
-  // }
-
-
-
-  console.log('Maita filteröidyssä taulukossa: ', filteredCountries.length)
   //jos maita on yli 10
-  if (filteredCountries.length > 10) {
-    console.log('Hakuehdon toteuttavia maita on yli 10.')
+  if (countries.length > 10) {
     return (
       <div>
         Liikaa maita, tarkenna hakua.
@@ -34,28 +22,29 @@ const Countries = (props) => {
     )
   }
   //jos maita on 2-10
-  if (filteredCountries.length > 1 && filteredCountries.length < 11) {
-    console.log('ehto 2')
+  if (countries.length > 1 && countries.length < 11) {
     return (
       <div>
-        Näytetään 2-10 hakuehdon täyttävää maata.
-        {/* {showFilteredCountries()} */}
+        <div>
+        {countries.map((country, indeksi) => 
+          <div key={indeksi}>
+              {country.name}
+              <button OnClick={handleClick(country)}>
+                Näytä
+              </button><br/></div>
+        )}
+        </div>      
       </div>
     )
   }
   //jos maita on tasan 1
-  if (filteredCountries.length === 1) {
-    console.log('ehto3.')
-    setShowCountry(filteredCountries[0])
-    console.log(filteredCountries[0].name)
+  if (countries.length === 1) {
     return (
-        filteredCountries.map(country => 
-        <li key={country.id}>{country.name}</li>)
+      <Country country={countries[0]}/>
     )
   } 
   //jos maita on tasan 0
-  if (filteredCountries.length === 0) {
-    console.log('ehto 4')
+  if (countries.length === 0) {
     return (
       <div>
         Ei hakuehdon täyttäviä maita.
@@ -65,69 +54,41 @@ const Countries = (props) => {
 }
 
 const Country = (props) => {
-  const {showCountry,} = props
-
-  const haeData = () => {
-    console.log('Kutsuttiin useEffect-metodia')
-    axios
-      .get('https://restcountries.eu/rest/v2/name/' + showCountry)
-      .then(response => {
-        console.log('promise fulfilled')
-        console.log('data: ', response.data)
-        //setPersons(response.data)
-      })
-  }
-  
-  useEffect(haeData, [])
-
-
-
+  const {country} = props
+  console.log(country)
 
   return (
     <div>
-      Tässä näytetään maahan liittyvät tiedot
+      <h1>{country.name}</h1>
+      <div>
+        <p><b>Capital:</b> {country.capital}</p>
+        <p><b>Population:</b> {country.population}</p>
+        <p><b>Languages:</b> {country.languages.map((language, indeksi) => 
+        <li key={indeksi}> {language.name} </li> )} </p>
+        <p>  <img src={country.flag} alt="Country flag" style={ {width: '180px', height: '150px'}}/> </p>
+      </div>
     </div>
   )
 }
 
 const App = () => {
-    const [countries, setCountries] = useState([
-      { id: 0, name: 'finland', capital: 'Helsinki', population: '5 million', languages: ['finnish', 'swedish'] },
-      { id: 1, name: 'sweden', capital: 'Stockholm', population: '6 million', languages: ['sweden'] },
-      { id: 2, name: 'spain', capital: 'Madrid', population: '7 million', languages: ['spain', 'catalan'] },
-      { id: 3, name: 'portugal', capital: 'Lisbon', population: '8 million', languages: ['portugal'] },
-      { id: 4, name: 'norway', capital: 'Oslo', population: '10 million', languages: ['norwegian'] },
-    ])
+    const [countries, setCountries] = useState([])
     const [filter, setFilter] = useState('')
-    const [showCountry, setShowCountry] = useState('finland')
+    const [country, setCountry] = useState('')
 
-    // useEffect( () => {
-    //   axios
-    //       .get('https://restcountries.eu/rest/v2/name/' + filter)
-    //       .then((response) => {
-    //           setCountries(response.data)
-    //       })
-    //       .catch((e) => {
-    //         setCountries([])
-    //       })
-      
-    //   }, [countryName])
-
-      const haeDataFilter = () => {
+      const haeData = () => {
         console.log('Kutsuttiin useEffect-metodiaa')
         axios
           .get('https://restcountries.eu/rest/v2/name/' + filter)
           .then(response => {
             console.log('promise fulfilled')
-            console.log('data: ', response.data)
-            console.log('nimi: ', response.data[0].name)
             setCountries(response.data)
           })
           .catch( (e) => {
             setCountries([])
           })
       }
-      useEffect(haeDataFilter, [filter])
+      useEffect(haeData, [filter])
 
 
 
@@ -137,12 +98,18 @@ const App = () => {
       console.log(event.target.value)
       setFilter(event.target.value)
     }
+    
+    const handleClick = (props) => {
+      return (
+      <Country country={props.country}/>
+      )
+    }
   
     return (
       <div>
         <h1> Find countries </h1>
         <Filter filter={filter} handleFilterChange={handleFilterChange}/>
-        <Countries countries={countries} filter={filter} setShowCountry={setShowCountry}/>
+        <Countries countries={countries} filter={filter} handleClick={handleClick}/>
       </div>
     )
   }
