@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Note from './components/Note.js'
+import noteService from './services/notes.js'
 
 const App = () => {
     const [notes, setNotes] = useState([])
@@ -9,13 +10,18 @@ const App = () => {
 
     const haeData = () => {
       console.log('Kutsuttiin useEffect-metodia')
-      axios
-        .get('http://localhost:3001/notes')
-        .then(response => {
-          console.log('promise fulfilled')
-          console.log('data: ', response.data)
-          setNotes(response.data)
-        })
+      noteService
+      .getAll()
+        .then(initialNotes => {
+        setNotes(initialNotes)
+      })
+      // axios
+      //   .get('http://localhost:3001/notes/')
+      //   .then(response => {
+      //     console.log('promise fulfilled')
+      //     console.log('data: ', response.data)
+      //     setNotes(response.data)
+      //   })
     }
     
     useEffect(haeData, [])
@@ -29,10 +35,15 @@ const App = () => {
     const allNotes = () => {
         return (
           notesToShow.map(note => 
-              <Note key={note.id} note={note}/>
+              <Note 
+                key={note.id} 
+                note={note}
+                toggleImportance={() => toggleImportanceOf(note.id)}/>
               )
         )
     }
+
+    // TAPAHTUMANKÄSITTELIJÄT
 
     const addNote = (event) => {
       event.preventDefault()
@@ -40,13 +51,22 @@ const App = () => {
         content: newNote,
         date: new Date().toISOString(),
         important: Math.random() > 0.5,
-        id: notes.length + 1,
       }
-      //concat luo uuden notes-taulukon, johon on
-      //lisätty alkio 'noteObject'
-      setNotes(notes.concat(noteObject))
-      //tyhjennetään newNote-objekti??
-      setNewNote('')
+
+      noteService
+      .create(noteObject)
+        .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+        setNewNote('')
+      })
+      // axios
+      //   .post('http://localhost:3001/notes', noteObject)
+      //   .then(response => {
+      //     //concat luo uuden taulukon johon lisää halutun jutun
+      //     setNotes(notes.concat(response.data))
+      //     setNewNote('')
+      //   console.log(response)
+      // })
     }
 
     const handleNoteChange = (event) => {
@@ -56,6 +76,22 @@ const App = () => {
 
     const handleClick = () => {
       setShowAll(!showAll)
+    }
+
+    const toggleImportanceOf = id => {
+      //const url = `http://localhost:3001/notes/${id}`
+      const note = notes.find(n => n.id === id)
+      const changedNote = { ...note, important: !note.important }
+    
+      noteService
+      .update(id, changedNote)
+        .then(returnedNote => {
+        setNotes(notes.map(note => note.id !== id ? note : returnedNote))
+      })
+      // axios.put(url, changedNote).then(response => {
+      //   setNotes(notes.map(note => note.id !== id ? note : response.data))
+      // })
+
     }
 
   

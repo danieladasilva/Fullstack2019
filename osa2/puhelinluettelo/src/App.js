@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import personService from './services/persons.js'
 
 const PersonForm = (props) => {
     const {persons, newName, newNumber, 
@@ -9,22 +10,18 @@ const PersonForm = (props) => {
     //Tämä on tapahtumankäsittelijä ja sen voisi ehkä siirtää Appiin???
     const addPerson = (event) => {
         event.preventDefault()
-        //jos nimi on jo taulukossa, palauttaa nimen
-        //jos nimi ei ole taulukossa, palauttaa 'undefined'
-        //eli jos nimi ei ole taulukossa (eli undefined === undefined), niin
-        //mennään sisään ja lisätään se taulukkoon
         if (persons.find(person => person.name === newName) === undefined) {
             const personObject = {
-                id: persons.length + 1,
+                //id: persons.length + 1,
                 name: newName,
                 number: newNumber
             }
-            //concat luo uuden persons-taulukon, johon on
-            //lisätty alkio 'personObject'
-            setPersons(persons.concat(personObject))
-            //tyhjennetään newName-objekti??
-            setNewName('')
-            setNewNumber('')
+            personService
+            .create(personObject) //palauttaa lisätyn personin
+              .then(returnedPerson => {
+              setPersons(persons.concat(returnedPerson))
+              setNewName('')
+            })
             console.log('uusi nimi ja numero lisätty:', newName, newNumber)
         } else {
             window.alert(newName + ' is already added to phonebook.')
@@ -48,11 +45,15 @@ const PersonForm = (props) => {
 }
 
 const Persons = (props) => {
-    const {persons, filter} = props
+    const {persons, filter, handleClick} = props
     const filteredPersons = persons.filter(person => person.name.includes(filter))
     return (
         filteredPersons.map(person => 
-            <li key={person.id}>{person.name} {person.number}</li>
+            <li key={person.id}>
+                {person.name} 
+                {person.number}
+                <button onClick={handleClick(person.id)}>Poista</button>
+            </li>
         )
     )  
 }
@@ -74,13 +75,18 @@ const App = () => {
 
   const haeData = () => {
     console.log('Kutsuttiin useEffect-metodia')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        console.log('data: ', response.data)
-        setPersons(response.data)
-      })
+    personService
+    .getAll()
+      .then(initialNotes => {
+      setPersons(initialNotes)
+    })
+    // axios
+    //   .get('http://localhost:3001/persons')
+    //   .then(response => {
+    //     console.log('promise fulfilled')
+    //     console.log('data: ', response.data)
+    //     setPersons(response.data)
+    //   })
   }
   
   useEffect(haeData, [])
@@ -102,6 +108,12 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  const handleClick = (id) => {
+        personService
+        .poista(id)
+        .then
+  }
+
   return (
     <div>
       <h1>Puhelinluettelo</h1>
@@ -115,7 +127,7 @@ const App = () => {
                 handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}/>
    
       <h2>Numerot</h2>
-      <Persons persons={persons} filter={filter}/>
+      <Persons persons={persons} filter={filter} handleClick={handleClick}/>
     </div>
   )
 

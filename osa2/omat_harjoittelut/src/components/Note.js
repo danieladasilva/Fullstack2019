@@ -9,9 +9,14 @@ import React from 'react'
 
 //OMA VERSIO KOMPONENTISTA:
 const Note = (props) => {
-    const note = props.note
+    const {note, toggleImportance} = props
+    const label = note.important
+        ? 'make not important' : 'make important'
     return (
-        <li>{note.content}</li>
+        <li>
+            {note.content}
+            <button onClick={toggleImportance}>{label}</button>
+        </li>
     )
 }
 

@@ -11,7 +11,7 @@ const Filter = (props) => {
 }
 
 const Countries = (props) => {
-  const {countries, handleClick} = props
+  const {countries, handleClick, showCountry} = props
 
   //jos maita on yli 10
   if (countries.length > 10) {
@@ -25,15 +25,13 @@ const Countries = (props) => {
   if (countries.length > 1 && countries.length < 11) {
     return (
       <div>
-        <div>
         {countries.map((country, indeksi) => 
           <div key={indeksi}>
               {country.name}
-              <button OnClick={handleClick(country)}>
-                Näytä
-              </button><br/></div>
-        )}
-        </div>      
+              <button onClick={handleClick(country)}>Näytä</button><br/>
+          {showCountry === country.name && <Country country={country}/>}
+          </div>
+        )}     
       </div>
     )
   }
@@ -75,6 +73,7 @@ const App = () => {
     const [countries, setCountries] = useState([])
     const [filter, setFilter] = useState('')
     const [country, setCountry] = useState('')
+    const [showCountry, setShowCountry] = useState('')
 
       const haeData = () => {
         console.log('Kutsuttiin useEffect-metodiaa')
@@ -99,17 +98,16 @@ const App = () => {
       setFilter(event.target.value)
     }
     
-    const handleClick = (props) => {
-      return (
-      <Country country={props.country}/>
-      )
+    const handleClick = (country) => () => {
+        setShowCountry(country.name)
+  
     }
   
     return (
       <div>
         <h1> Find countries </h1>
         <Filter filter={filter} handleFilterChange={handleFilterChange}/>
-        <Countries countries={countries} filter={filter} handleClick={handleClick}/>
+        <Countries countries={countries} filter={filter} handleClick={handleClick} showCountry={showCountry}/>
       </div>
     )
   }
