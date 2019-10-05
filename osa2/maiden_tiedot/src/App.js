@@ -9,9 +9,10 @@ const Filter = (props) => {
       </div>
   )
 }
+const koodi = 'af90533091254a1eb10172105193108'
 
 const Countries = (props) => {
-  const {countries, handleClick, showCountry} = props
+  const {countries, handleClick, showCountry, setSpeed, speed, direction, setDirection, temperature, setTemperature} = props
 
   //jos maita on yli 10
   if (countries.length > 10) {
@@ -38,7 +39,7 @@ const Countries = (props) => {
   //jos maita on tasan 1
   if (countries.length === 1) {
     return (
-      <Country country={countries[0]}/>
+      <Country country={countries[0]} speed={speed} setSpeed={setSpeed} direction={direction} setDirection={setDirection} temperature={temperature} setTemperature={setTemperature}/>
     )
   } 
   //jos maita on tasan 0
@@ -52,8 +53,30 @@ const Countries = (props) => {
 }
 
 const Country = (props) => {
-  const {country} = props
+  const {country, speed, setSpeed, direction, setDirection, temperature, setTemperature} = props
   console.log(country)
+
+
+  const haeSaaTiedot = () => {
+    axios
+        .get(`https://api.apixu.com/v1/current.json?key=af90533091254a1eb10172105193108&q=${country.capital}`)
+        .then((response) => {
+          
+          setSpeed(response.data.current.wind_kph)
+          setDirection(response.data.current.wind_dir)
+          setTemperature(response.data.current.temp_c)
+            {/* setWind({speed: response.data.current.wind_kph, 
+                     direction: response.data.current.wind_dir})
+            setTemperature(response.data.current.temp_c) */}
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    
+  }
+
+  useEffect(haeSaaTiedot, [])
+
 
   return (
     <div>
@@ -64,6 +87,11 @@ const Country = (props) => {
         <p><b>Languages:</b> {country.languages.map((language, indeksi) => 
         <li key={indeksi}> {language.name} </li> )} </p>
         <p>  <img src={country.flag} alt="Country flag" style={ {width: '180px', height: '150px'}}/> </p>
+        <p><b>Weather in {country.capital}:</b></p>
+        <p>temperature: {country.capital}</p>
+        <p>wind: {speed} kph </p>
+        <p>direction: {direction} </p>
+        <p>temperature: {temperature} celsius</p>
       </div>
     </div>
   )
@@ -74,6 +102,9 @@ const App = () => {
     const [filter, setFilter] = useState('')
     const [country, setCountry] = useState('')
     const [showCountry, setShowCountry] = useState('')
+    const [speed, setSpeed] = useState()
+    const [direction, setDirection] = useState()
+    const [temperature, setTemperature] = useState()
 
       const haeData = () => {
         console.log('Kutsuttiin useEffect-metodiaa')
@@ -107,7 +138,7 @@ const App = () => {
       <div>
         <h1> Find countries </h1>
         <Filter filter={filter} handleFilterChange={handleFilterChange}/>
-        <Countries countries={countries} filter={filter} handleClick={handleClick} showCountry={showCountry}/>
+        <Countries countries={countries} filter={filter} handleClick={handleClick} showCountry={showCountry} speed={speed} setSpeed={setSpeed} direction={direction} setDirection={setDirection} temperature={temperature} setTemperature={setTemperature}/>
       </div>
     )
   }
